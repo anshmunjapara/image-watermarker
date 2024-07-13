@@ -18,7 +18,6 @@ class MainWindow(Tk):
         self.font_color = "white"
 
         self.title = Label(text="Add watermark to your Images", font=("Arial", 24, "bold"))
-        # title.grid(row=0, column=0, columnspan=2)
         self.title.pack()
 
         self.canvas = Canvas(self, width=800, height=500, bg="white")
@@ -26,7 +25,6 @@ class MainWindow(Tk):
         self.canvas.pack()
 
         self.place_watermark = Button(text="Place watermark", command=self.track_mouse)
-        # self.place_watermark.grid(row=1, column=3)
         self.place_watermark.pack()
 
         self.add_image_btn = Button(text="Add Image", command=self.open_image)
@@ -37,6 +35,7 @@ class MainWindow(Tk):
 
         self.save_btn = Button(self, text="Save Image", command=self.save_image)
         self.save_btn.pack()
+
     def set_image_by_path(self, path):
         self.full_quality_image = Image.open(path)
         self.original_image = Image.open(path).resize(
@@ -85,10 +84,10 @@ class MainWindow(Tk):
 
     def save_image(self):
         self.draw = ImageDraw.Draw(self.full_quality_image)
-        self.font = ImageFont.truetype("arial/arial.ttf", 25)
+        self.font = ImageFont.truetype("Arial", 25)
         self.draw.text((self.mouse_x - 75, self.mouse_y - 70), self.text, font=self.font)
-        self.full_quality_image.save('test.jpg')
-        # self.image_file.save('new.jpg')
+        self.full_quality_image.save('water Marked Image.jpg')
+
 
 main_window = MainWindow()
 main_window.mainloop()
