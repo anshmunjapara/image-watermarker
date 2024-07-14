@@ -12,10 +12,17 @@ class MainWindow(Tk):
         self.text = None
         self.original_image = None
         self.full_quality_image = None
-        self.image_file = self.original_image
+        self.image_file = None
         self.img = None
         self.image_path = None
         self.font_color = "white"
+        self.mouse_position_captured = False
+        self.save_path = None
+        self.image_width = None
+        self.image_height = None
+        self.scale = None
+        self.x_adj = None
+        self.y_adj = None
 
         self.title = Label(text="Add watermark to your Images", font=("Arial", 24, "bold"))
         self.title.pack()
@@ -38,14 +45,17 @@ class MainWindow(Tk):
 
     def set_image_by_path(self, path):
         self.full_quality_image = Image.open(path)
+        self.image_width, self.image_height = self.full_quality_image.size
+        print(f"===Image Size=== {self.image_width}")
+        self.scale = min(700 / self.image_width, 400 / self.image_height)
+        self.x_adj = (800 - (self.image_width*self.scale))/2
+        self.y_adj = (500 - (self.image_height * self.scale)) / 2
         self.original_image = Image.open(path).resize(
-            (700, 400))
+            (int(self.image_width * self.scale), int(self.image_height * self.scale)))
         self.img = ImageTk.PhotoImage(self.original_image)
-
         self.set_image()
 
     def set_image(self):
-
         self.canvas.create_image(400, 250, image=self.img)
 
     def track_mouse(self):
@@ -72,7 +82,7 @@ class MainWindow(Tk):
         if self.text is not None:
             self.draw = ImageDraw.Draw(self.image_file)
             self.font = ImageFont.truetype(font="Arial", size=25)
-            self.draw.text((self.mouse_x - 75, self.mouse_y - 70), self.text, font=self.font)
+            self.draw.text((self.mouse_x - self.x_adj, self.mouse_y - self.y_adj), self.text, font=self.font, anchor='ms')
             self.img = ImageTk.PhotoImage(self.image_file)
 
             self.set_image()
@@ -84,9 +94,13 @@ class MainWindow(Tk):
 
     def save_image(self):
         self.draw = ImageDraw.Draw(self.full_quality_image)
-        self.font = ImageFont.truetype("Arial", 25)
-        self.draw.text((self.mouse_x - 75, self.mouse_y - 70), self.text, font=self.font)
-        self.full_quality_image.save('water Marked Image.jpg')
+        self.font = ImageFont.truetype("Arial", 40)
+        self.draw.text((self.mouse_x , self.mouse_y), self.text, font=self.font)
+        print(f"=== Scale ==={self.scale}")
+        self.save_path = filedialog.asksaveasfile(initialfile='Untitled.jpg',
+                                                  defaultextension=".jpg",
+                                                  filetypes=(("jpeg files", "*.jpg"), ("all files", "*.*")))
+        self.full_quality_image.save(self.save_path)
 
 
 main_window = MainWindow()
