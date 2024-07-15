@@ -46,9 +46,9 @@ class MainWindow(Tk):
     def set_image_by_path(self, path):
         self.full_quality_image = Image.open(path)
         self.image_width, self.image_height = self.full_quality_image.size
-        print(f"===Image Size=== {self.image_width}")
+        print(f"===Image Size=== {self.image_width}, {self.image_height}")
         self.scale = min(700 / self.image_width, 400 / self.image_height)
-        self.x_adj = (800 - (self.image_width*self.scale))/2
+        self.x_adj = (800 - (self.image_width * self.scale)) / 2
         self.y_adj = (500 - (self.image_height * self.scale)) / 2
         self.original_image = Image.open(path).resize(
             (int(self.image_width * self.scale), int(self.image_height * self.scale)))
@@ -82,7 +82,8 @@ class MainWindow(Tk):
         if self.text is not None:
             self.draw = ImageDraw.Draw(self.image_file)
             self.font = ImageFont.truetype(font="Arial", size=25)
-            self.draw.text((self.mouse_x - self.x_adj, self.mouse_y - self.y_adj), self.text, font=self.font, anchor='ms')
+            self.draw.text((self.mouse_x - self.x_adj, self.mouse_y - self.y_adj), self.text, font=self.font,
+                           anchor='ms')
             self.img = ImageTk.PhotoImage(self.image_file)
 
             self.set_image()
@@ -93,9 +94,13 @@ class MainWindow(Tk):
         self.set_image_by_path(self.image_path)
 
     def save_image(self):
+        print(f"Mouse position on canvas: ({self.mouse_x}, {self.mouse_y})")
+        print(f"Adjusted position: ({(self.mouse_x - self.x_adj) / self.scale}, {(self.mouse_y - self.y_adj) / self.scale})")
+        print(f"Scale: {self.scale}, x_adj: {self.x_adj}, y_adj: {self.y_adj}")
         self.draw = ImageDraw.Draw(self.full_quality_image)
-        self.font = ImageFont.truetype("Arial", 40)
-        self.draw.text((self.mouse_x , self.mouse_y), self.text, font=self.font)
+        self.font = ImageFont.truetype("Arial", 25/self.scale)
+        self.draw.text(((self.mouse_x - self.x_adj) / self.scale, (self.mouse_y - self.y_adj) / self.scale), self.text,
+                       font=self.font, anchor='ms')
         print(f"=== Scale ==={self.scale}")
         self.save_path = filedialog.asksaveasfile(initialfile='Untitled.jpg',
                                                   defaultextension=".jpg",
