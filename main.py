@@ -1,4 +1,4 @@
-from tkinter import Label, Tk, Canvas, Button, filedialog, Text
+from tkinter import Label, Tk, Canvas, Button, filedialog, Text, Scale, IntVar, HORIZONTAL, DoubleVar
 from PIL import Image, ImageTk, ImageDraw, ImageFont
 
 
@@ -16,6 +16,8 @@ class MainWindow(Tk):
         self.img = None
         self.image_path = None
         self.font_color = "white"
+        self.font_size = DoubleVar()
+        self.final_font_size = None
         self.mouse_position_captured = False
         self.save_path = None
         self.image_width = None
@@ -42,6 +44,12 @@ class MainWindow(Tk):
 
         self.save_btn = Button(self, text="Save Image", command=self.save_image)
         self.save_btn.pack()
+
+        self.font_size_slider = Scale(self, variable=self.font_size, from_=15, to=50, orient=HORIZONTAL)
+        self.font_size_slider.pack()
+        # root, variable = v1,
+        # from_ = 1, to = 100,
+        # orient = HORIZONTAL
 
     def set_image_by_path(self, path):
         self.full_quality_image = Image.open(path)
@@ -77,11 +85,12 @@ class MainWindow(Tk):
             self.place_watermark_at_position()
 
     def place_watermark_at_position(self):
+        self.final_font_size = self.font_size.get()
         self.image_file = self.original_image.copy()
         self.text = self.text_area.get("1.0", 'end-1c')
         if self.text is not None:
             self.draw = ImageDraw.Draw(self.image_file)
-            self.font = ImageFont.truetype(font="Arial", size=25)
+            self.font = ImageFont.truetype(font="Arial", size=self.font_size.get())
             self.draw.text((self.mouse_x - self.x_adj, self.mouse_y - self.y_adj), self.text, font=self.font,
                            anchor='ms')
             self.img = ImageTk.PhotoImage(self.image_file)
@@ -95,10 +104,11 @@ class MainWindow(Tk):
 
     def save_image(self):
         print(f"Mouse position on canvas: ({self.mouse_x}, {self.mouse_y})")
-        print(f"Adjusted position: ({(self.mouse_x - self.x_adj) / self.scale}, {(self.mouse_y - self.y_adj) / self.scale})")
+        print(
+            f"Adjusted position: ({(self.mouse_x - self.x_adj) / self.scale}, {(self.mouse_y - self.y_adj) / self.scale})")
         print(f"Scale: {self.scale}, x_adj: {self.x_adj}, y_adj: {self.y_adj}")
         self.draw = ImageDraw.Draw(self.full_quality_image)
-        self.font = ImageFont.truetype("Arial", 25/self.scale)
+        self.font = ImageFont.truetype("Arial", (self.final_font_size / self.scale))
         self.draw.text(((self.mouse_x - self.x_adj) / self.scale, (self.mouse_y - self.y_adj) / self.scale), self.text,
                        font=self.font, anchor='ms')
         print(f"=== Scale ==={self.scale}")
